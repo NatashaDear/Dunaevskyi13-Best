@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ДМШ №13 им. И. О. Дунаевского - Актёрское мастерство Железкова А.А. </title>
+    <title>ДМШ №13 им. И. О. Дунаевского - Актёрское мастерство Железкова А.А.</title>
     <style>
-        /* Стили остаются теми же, что были */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
@@ -21,11 +20,13 @@
             background: #000;
             box-shadow: 0 20px 35px -12px rgba(0,0,0,0.6);
         }
-        video {
-            width: 100%;
+        .video-section iframe {
             display: block;
-            background: #000;
+            width: 100%;
             aspect-ratio: 16 / 9;
+            border: none;
+            border-radius: 28px;
+            background: #000;
         }
         .thumbnails-grid {
             display: grid;
@@ -114,103 +115,108 @@
             body { padding: 1rem; }
             .thumbnails-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; }
             .video-title { font-size: 0.75rem; padding: 0.5rem; }
+            .video-section iframe { aspect-ratio: 16 / 9; }
         }
     </style>
 </head>
 <body>
 <div class="app-container">
     <div class="info-bar">
-        <h2>📽️ ДМШ№13 им. И.О.Дунаевского - Актерское мастерство Железкова А.А. </h2>
+        <h2>📽️ ДМШ№13 им. И.О.Дунаевского - Актерское мастерство Железкова А.А.</h2>
         <span class="video-count" id="videoCount">0 видео</span>
     </div>
 
+    <!-- Плеер RuTube в iframe -->
     <div class="video-section">
-        <video id="mainPlayer" controls preload="metadata" playsinline></video>
+        <iframe id="mainPlayer"
+                src=""
+                allow="clipboard-write; autoplay"
+                allowfullscreen>
+        </iframe>
     </div>
 
+    <!-- Галерея миниатюр -->
     <div class="thumbnails-grid" id="thumbnailsGrid"></div>
 </div>
 
-<!-- Подключаем hls.js -->
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
 <script>
     // ------------------------------------------------------------
-    // 1. СПИСОК ВИДЕО (ЗАМЕНИТЕ НА СВОИ ДАННЫЕ)
+    // 1. СПИСОК ВИДЕО — ВСТАВЬТЕ СВОИ ССЫЛКИ С RUTUBE
+    //    Ссылка должна быть только вида:
+    //    https://rutube.ru/play/embed/.../?p=...
+    //    (без тегов <iframe>, просто строка)
     // ------------------------------------------------------------
     const videos = [
         {
             id: 1,
             title: "Вера Пятина",
-            // Вместо MP4-файла — ссылка на master-playlist.m3u8 (адаптивная)
-            src: "https://downloader.disk.yandex.ru/disk/5f755f1d9530ca70a8bf4111ff61177cb0b65346278684f9e072a7dd522abdf4/6a3664f9/tyeJOkurigaiCapGty6UsvKdtXN0fviWZC8l2YD9sIKBmYHhZ2TfydnP2GWS4jdTH2baDOBT7pr1pvCeJVNjVw%3D%3D?uid=0&filename=blabla.mp4&disposition=attachment&hash=TBNKHu5mUU1h6xk46wpFBLldvZxz5P0Nllc4XVaYgDdcUxYZ0RSUDP0ks3zS6//vq/J6bpmRyOJonT3VoXnDag%3D%3D%3A&limit=0&content_type=video%2Fmp4&owner_uid=39607226&fsize=85264638&hid=b870a571cb5b6422c71bab0c5d918f13&media_type=video&tknv=v3&is_direct_zip_experiment=1",
-            thumbnail: "blabla.png" // оставьте пустым или укажите свою картинку
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_1/?p=ваш_ключ", // ЗАМЕНИТЕ
+            thumbnail: "blabla.png"
         },
-
         {
             id: 2,
             title: "Маша Мотовилова",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX196sTInm4OqNXgwqwAeEuFRAmmSqomiKPSBg_7E8zpOQ3UVvqQ7DLqgGCDUFe9585Uq02cukf8WntKbzg3l-gBxnMOkSw_O_suSBUylTDcuR508OHKGOasqMXFE0yE1uZzyRUoV2b1MYe2mr0wzyXWj48cZ-NYsGML3Vato9wamez9HWpdZxIBuJ6SN-Iejt66jsGL3owvrdAxvTNKSxf58ZmDmoltPt4CPtXZ76s-LmPtYNAfTT2usl4ldS_XPt5Cqn6YWB6MEIu_Di6XmXmL16eARkVgfpI9AlqRQWkeIOdkaNX7SXg2_P2SKT_hZRVuK19Q73H8Bdn96C-sIfLjcpsjISD2dTbiDXxCjaeM88TPBiz6MZdfA/654811f2aa210/e52f3560680db7d34523809e561936a16547557d04abe02126cf7da4bab6b4ef/240p/playlist.m3u8",
-            thumbnail: "dogs.png"   // ПУТЬ К МИНИАТЮРЕ (можно оставить пустым)
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_2/?p=ваш_ключ",
+            thumbnail: "dogs.png"
         },
         {
             id: 3,
             title: "Анастасия Сулейманова",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX18WcDqgylYsRKx8-bbzCq96L6hbLB-8L5D3pafY6tmaVykKHtzEy8f8l3PCYflbfPqinxf4SCMZ6txm2jNCltyPcXDta3y4bNaY_3elAhPRn4r431h9PrxhsrsAtgIzpm8j1gGmKCfFuT95T26W1i9Y-g_uNisSB8guKBEnIsiZW3Qu2eSAjiyASyyqMZ67B9al2Zd5x6r4fswUBGbwYf6e8OTVUyHLEnh5MRHXIU93DJKmrY2TaE04avuxAsxSrZmsaN-EK4Iye-P0JbgUJ-kOoPeBrjIm9jQjQ3Zd4eXJrsrWpGncsmi3PfUpk0jefAUMw9_ewlVrTp1DqwwRTW46AUjenzX8xJxlVWJwcK8U5GYCduEIFxhn/654812a7964a8/86811d0e91b2000ca0fcc3fde33bf6d61aad125273ea4bfb78b5193da4744c21/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_3/?p=ваш_ключ",
             thumbnail: "pencil.png"
         },
         {
             id: 4,
             title: "Егор Ковальчук",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX1-R6T56p0BFTV3xE5Kzf5w_ZB3uqLhBtbv1pPleBiz-rlNT3D7dIhNzotaFpM3sW50f_YStyvc4HxfGCkzcc4naHJx1RY5ag8pfWwIrSPbWJYa054Y5DZaLo6aNk1BN6SqAmtoYC_90DziROP8X9J1PVg8TBD58Ke8fJnsS96yn4HMKIDDUItR3eoB_ldR_b_wkUr1_eZ-igH71XwLy40anDjJxbzNTkbqrQDFAHtvZrv-_ZX3cie5CHDPY-jSYz9toTyRcCPi4Pob3LFkQcWe3ICrkNj-CgIkWA49pxx1GCfrPO6wX-69MmB6jjV7CuHiAuDdmUXuLllqoTcFUGYMrod0exeUawqA2H-URRH0__8-rnsoKeF4e/6548133a7cfb0/2af5e6dc8f09135dcc05e0fc7652b9d0061ece0cab38952d214e14fb0810d906/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_4/?p=ваш_ключ",
             thumbnail: "love.png"
         },
         {
             id: 5,
             title: "Платон Полозов - Егор Ковальчук",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX1-ftcCcqI0cV-5GC_G6fZS92QuOhtr6qSaNtU_PdUFVZhNo75AQY7KF8PfG2pBd3jf1kbPAeQgk-L7DljGCjbPNMW3bQuygbh64ceruqZ2LvY5xpYcODTJuIz0iqxIAacSP0mvapnS5JPD2oJ1sVTuU0TM-ZGNzTfArYv5cBxsvQWghsyKww00KKMhKtftWH3VErK9lsRzdSp5OlZX2K-LtCS5heBT-6XTfYs4OhGZFS63K0rq-FtJ0PlsBQ4gs38dgXjHo5TCDik9jL_MAtck7d1bYD64tFLeV0EKdhwPD3VcfRbw1qfJCNZEYGH5dKPQC_TG3BvdBv6-Rlsb406BuKPPx5tOH5niudTQMcvO_4e27VnRDSV06/654813c116be8/3e58b881c3b44c951dff18a031459745a888170edda77786ba8ab2bcb6dd3e34/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_5/?p=ваш_ключ",
             thumbnail: "note.png"
         },
         {
             id: 6,
             title: "Татьяна Майкова",
-            src: "<iframe width="720" height="405" src="https://rutube.ru/play/embed/516871e36f3b4cfa42896a57e4a096c2/?p=ltV5UhkLuC4JZPdlTzs6yw"  allow="clipboard-write; autoplay" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>",
+            src: "https://rutube.ru/play/embed/516871e36f3b4cfa42896a57e4a096c2/?p=ltV5UhkLuC4JZPdlTzs6yw", // ЭТА ССЫЛКА РАБОЧАЯ, ЕЁ МОЖНО ОСТАВИТЬ
             thumbnail: "bine.jpg"
         },
         {
             id: 7,
             title: "Виктория Смирнова",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX1_7BIqTBeA3PyBoA2oa6W6zHRdNGPzv0LTPSteACfYVXaPfjqAYAJiYYdEiRo0rE5cEXLQJiUxKF-8GkJhWaX6ySy7BHRweANaiHUvj-ZH4vklpXGOTjHklt9JvMzBROoOqhRWPFSbc9ZkkspIQ7TP8ehNoVskKew9J9dPNDfdNGPVG9CLWOKThMtrFxqm_gSFz_X1rcGC-r8hDenKG8_WfRWPmYg6xAz0P_9pseEvf7zo8vjO5qmpb8NaLu2Tb1zWOq13hTYTtA2yBYuShUIOqjXQDDpG5phBSaEMic439gMwVau7oH3gNwmpnHe2kipl3BGL0thk1_VkKQ4hnsVsb7WQFY7Oe47rcMW1Lpvlr2NBW7QdfzEOo/65481477b8a68/1662f27b97bca9bcd5d1eed9caa931b33e3e855c2cbe78b438ff0faf27821bcd/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_7/?p=ваш_ключ",
             thumbnail: "beautiful.png"
         },
         {
             id: 8,
             title: "Анна Шавлюга",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX1_JaKKCdENH72_TqnX2P6VNA1nqqTmtWTHHA5UHZYEIqrTQOGMHUABCEoDP6lbyM0fot_eQ1amJmh8-1_AMtYpWXhJkg6ewGfmZxkAF-K9H07Iu9O4uFpmfXJjSy9L8f1WeA-uyWSL6t6oKtRBcZNuD52khm6bCKry_TOo6BhLDeKA1EoTNsGIMwua30E5uKT5vsl6XVR0HpVcKmES0kGzk-cwzKkD43vAYZx7fJEanzIrZtunucBHOc-Z9eKew2oiZfCSrqJhVTNMlYNdHxhGui9ACBks6Bj7UgLMWGlisd8px-u05NYOOHTlxS8CoaxphJczeu4VLpq98Zn0ZAvBk81arLEHNXknOVYdEIAxRdbCoSBF9idNU/65481988a3e18/f5fe76fcd0767daf0797c33edadb0ae782fc9b29c53f20b65c9a15fad92e9dc0/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_8/?p=ваш_ключ",
             thumbnail: "first.png"
         },
         {
             id: 9,
             title: "Алиса Кирдакова",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX19lDhi3rv5o9dD3_NoXOEfZLWO3jTKqBvXx6AGjLeBbPX9mqWymduVrAa9VDfghNAaNUKYzar-dvNTs1OBY8HF94yjLNcfwc-J90bXdEid8H49tlyuTqGrDxTMpJ9DXeGuYdD7PCHnBSlgy9ZOeYfvQCW6AXCPeJ8pW3_yb8Hd5g6Uyulg7wATJHv90WMjT4hQI9GNQmUAl-3EkgSGVJso8dIoiaGD5dy_SAGPvY8_nLdf48BYINp3OfwJI6giM7eQ1ciq9ueLjSfWhqjgQ8h3tK-13hBpciMs2RfDloufOJjCxghqCAn52sF2Y0pQFHkAsPbdfbaftaj2TQg18uFMO35SkvLrUGTBwZVHpSqI_iBrmfWEuNS1i/6548176d5ea88/6ea3389ef79925b542d46162d920ec48cf23b63a1defcba642bddc7d6c8dee60/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_9/?p=ваш_ключ",
             thumbnail: "magick.png"
         },
         {
             id: 10,
             title: "Марк Галкин",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX18fIfaAnP3u0NGT703nEhwWZCIhAeiBBJOiKCiGWYRBCMnfg0Da-fVSHHrw_6Q_cbX6q4zpPp3szwl2fcdpzNCiCz8jt63dzXlwBuxvtX0Erxan84-2upyOkfAIKTVeDsbeCETlGA9MlFZPLmN5NZoAIRwMF9CXNX0y4KM1bmz_Z0sTlqUjSNm_tj-jhH0jYQDFfCpLPi0so1JgTuLONyf4yjQIYXJLw_GtgdexuHVJv6l683NNIc2N_0FFdUzdb4Hr46pl-QW5Gu2O9fCuO_p4bqxnl09jZ4eDgYdV9UP_C_ZltDjvtjVVFzd6eqCDIg6KXNzJ8AJmteX9fsTY67FqXo5QTSmcF8wfzCGMDopOFzGUP5hicAT0/654817a15b408/f178af568f031f339c2af08718feed19bc2329bc497bd96847e2bd168ffdedda/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_10/?p=ваш_ключ",
             thumbnail: "temp.png"
         },
         {
             id: 11,
             title: "Фёдор Еремеев",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX18mXtLuUJ-YZzKsyV-BYRolts4dLAdCmkYwDdIHgND7DpZnEmnFMNqRmAEq0GpfSKshrp93v2D8l9lNVmTyh8LUyVkE2NNl_QgWoxQTxNsCtO-W1AiuzkK-DIacnngP4kky-eefVA28XsS395R0QAOyBtmp4ykfqGr9df1Sqf1rZFaY07NEe8DX8qVn-t1TsVgZsRFhe5vbNZ3pIraKooaeSRubE_lcgo8pQ5hVsJQ9Ht-w1id8c4cpY6ZbejkChqS7NZboz3Gh4Qh729_oi_IYV6u6a3FKMW04gjGFzl9GS-ItzT8dwhVZp_krvLBq7zxUuTtzQ8UXXsPGL8-9nIkB3GFj08mzJwU2GlzmY_D03sqPk0U2X5Dg/654817e248970/58f0bf3cec132ad61cfcbe5635211d099df70ac62e1239f66a3619ba0cec965f/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_11/?p=ваш_ключ",
             thumbnail: "ahtung.png"
         },
         {
             id: 12,
             title: "Тимур Миндияров",
-            src: "https://streaming.disk.yandex.net/hls/U2FsdGVkX19ZrWdzCB3I2s4qgWfuh8yfG9CUM9bQmr8uCZ4u4zEpLRFKwh9byTnIQfX4z5EybsAHTXiwls8pws9jLXFEnO6wVttqeCu6_Nr8aoW6RkHm-nowgubCKIaXUM24RqEwJhUwbrzx4eqLrfghso334PCBLsnnIf1An_84W1zoBf-s46fj1paUD8rFDfP1b7PyVLF-0DaCwrgMgfYv5rG1ml-tk-n9-71dU4GgFEOOfh78FKj8sqFi1V8AeYwhQ7caaHQIkHXyk2_oTYrUYhQwIONJDBScknfQyhVQxTGlPdF8q1fK93TLIoMSoz7vVR0Gw0fp0EQOBSFVuLo59cAF-5NNq7wlYgKsgz0Hc35Bt7mrVwUE4FW6qMRe/6548184297600/de60b4569f16642e993a62a55e540ba5e40622a150a6b51b1d42e224fdaeb37d/240p/playlist.m3u8",
+            src: "https://rutube.ru/play/embed/ваш_идентификатор_12/?p=ваш_ключ",
             thumbnail: "sleep.png"
         }
     ];
@@ -218,45 +224,13 @@
     // ------------------------------------------------------------
     // 2. ИНИЦИАЛИЗАЦИЯ
     // ------------------------------------------------------------
-    const player = document.getElementById('mainPlayer');
+    const iframe = document.getElementById('mainPlayer');
     const gridContainer = document.getElementById('thumbnailsGrid');
     const videoCountSpan = document.getElementById('videoCount');
 
-    // Переменная для хранения текущего экземпляра Hls
-    let hls = null;
-
-    function destroyHls() {
-        if (hls) {
-            hls.destroy();
-            hls = null;
-        }
-    }
-
+    // Функция загрузки видео — просто меняем src у iframe
     function loadVideo(src) {
-        destroyHls();
-        // Если браузер поддерживает HLS нативно (Safari), используем напрямую
-        if (player.canPlayType('application/vnd.apple.mpegurl')) {
-            player.src = src;
-            player.play();
-            return;
-        }
-        // Иначе используем hls.js
-        if (Hls.isSupported()) {
-            hls = new Hls();
-            hls.loadSource(src);
-            hls.attachMedia(player);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                // player.play();
-            });
-            // Обработка ошибок
-            hls.on(Hls.Events.ERROR, function(event, data) {
-                console.error('HLS ошибка:', data);
-            });
-        } else {
-            // Если ничего не поддерживается
-            player.src = src;
-            player.play();
-        }
+        iframe.src = src;
     }
 
     // ------------------------------------------------------------
@@ -266,11 +240,10 @@
         gridContainer.innerHTML = '';
         videoCountSpan.innerText = `${videos.length} видео`;
 
-        videos.forEach((video, index) => {
+        videos.forEach((video) => {
             const card = document.createElement('div');
             card.className = 'video-card';
-            card.setAttribute('data-video-id', video.id);
-            card.setAttribute('data-video-src', video.src);
+            card.dataset.videoSrc = video.src;
 
             const thumbDiv = document.createElement('div');
             thumbDiv.className = 'thumbnail';
@@ -297,11 +270,10 @@
             card.appendChild(thumbDiv);
             card.appendChild(titleDiv);
 
-            card.addEventListener('click', (e) => {
-                const src = card.getAttribute('data-video-src');
+            card.addEventListener('click', () => {
+                const src = card.dataset.videoSrc;
                 if (src) {
                     loadVideo(src);
-                    // выделение
                     document.querySelectorAll('.video-card').forEach(c => c.classList.remove('active'));
                     card.classList.add('active');
                 }
