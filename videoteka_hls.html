@@ -126,7 +126,6 @@
         <span class="video-count" id="videoCount">0 видео</span>
     </div>
 
-    <!-- Плеер RuTube в iframe -->
     <div class="video-section">
         <iframe id="mainPlayer"
                 src=""
@@ -135,88 +134,84 @@
         </iframe>
     </div>
 
-    <!-- Галерея миниатюр -->
     <div class="thumbnails-grid" id="thumbnailsGrid"></div>
 </div>
 
 <script>
     // ------------------------------------------------------------
-    // 1. СПИСОК ВИДЕО — ВСТАВЬТЕ СВОИ ССЫЛКИ С RUTUBE
-    //    Ссылка должна быть только вида:
-    //    https://rutube.ru/play/embed/.../?p=...
-    //    (без тегов <iframe>, просто строка)
+    // 1. СПИСОК ВИДЕО (ВСЕ ССЫЛКИ С RUTUBE)
     // ------------------------------------------------------------
     const videos = [
         {
             id: 1,
             title: "Вера Пятина",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_1/?p=ваш_ключ", // ЗАМЕНИТЕ
+            src: "https://rutube.ru/play/embed/b9861848bc40d53a1b32c211845ebe4e/?p=N5auZnFzQEU-f1e1M6zwDg",
             thumbnail: "blabla.png"
         },
         {
             id: 2,
             title: "Маша Мотовилова",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_2/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/d182a4cf206f4d216b68137712b345ae/?p=yKsGsLyCEuusavdHYChg5g",
             thumbnail: "dogs.png"
         },
         {
             id: 3,
             title: "Анастасия Сулейманова",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_3/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/b57561eb37aa73019c93fef42dcda555/?p=oW91yT2anR5_krr0iXEPKg",
             thumbnail: "pencil.png"
         },
         {
             id: 4,
             title: "Егор Ковальчук",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_4/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/e84ab7984496a4f6d070e0b3a9101e54/?p=B0ZRTvF2zDfgcF1APsrFUA",
             thumbnail: "love.png"
         },
         {
             id: 5,
             title: "Платон Полозов - Егор Ковальчук",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_5/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/6ce4eccb6de8855b3afde40a3fab6308/?p=AAhs_f96gpXtPY-oRTXqig",
             thumbnail: "note.png"
         },
         {
             id: 6,
             title: "Татьяна Майкова",
-            src: "https://rutube.ru/play/embed/516871e36f3b4cfa42896a57e4a096c2/?p=ltV5UhkLuC4JZPdlTzs6yw", // ЭТА ССЫЛКА РАБОЧАЯ, ЕЁ МОЖНО ОСТАВИТЬ
+            src: "https://rutube.ru/play/embed/516871e36f3b4cfa42896a57e4a096c2/?p=ltV5UhkLuC4JZPdlTzs6yw",
             thumbnail: "bine.jpg"
         },
         {
             id: 7,
             title: "Виктория Смирнова",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_7/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/97a7113e35412df6dacb4c8f0c431791/?p=WxGEiYP11MkMTKCN6ZjUdQ",
             thumbnail: "beautiful.png"
         },
         {
             id: 8,
             title: "Анна Шавлюга",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_8/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/519fa4170a4acc2ac3e1834168c03bbf/?p=JjTEEyztJFmDJOSOL4YmyA",
             thumbnail: "first.png"
         },
         {
             id: 9,
             title: "Алиса Кирдакова",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_9/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/5805c46d5f9ad92ef7d5393c0f05394e/?p=G6Nlouyd7XuwcJgIR8t5cA",
             thumbnail: "magick.png"
         },
         {
             id: 10,
             title: "Марк Галкин",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_10/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/6283e927e72df3049ce12304d4bbfe47/?p=PUQB5KatJuGUBYR0gnNoSA",
             thumbnail: "temp.png"
         },
         {
             id: 11,
             title: "Фёдор Еремеев",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_11/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/4041a5a160ce7368809fdd1ecfa02400/?p=9NCz4qbrJ8IUg8qx_EfJsQ",
             thumbnail: "ahtung.png"
         },
         {
             id: 12,
             title: "Тимур Миндияров",
-            src: "https://rutube.ru/play/embed/ваш_идентификатор_12/?p=ваш_ключ",
+            src: "https://rutube.ru/play/embed/a8de7c707a4994d964e02a25dc1ea84b/?p=ftUpX9Y1STrtZNsT-2bHTg",
             thumbnail: "sleep.png"
         }
     ];
@@ -228,7 +223,6 @@
     const gridContainer = document.getElementById('thumbnailsGrid');
     const videoCountSpan = document.getElementById('videoCount');
 
-    // Функция загрузки видео — просто меняем src у iframe
     function loadVideo(src) {
         iframe.src = src;
     }
