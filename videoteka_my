@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Личная видеотека Пятиной Н.В.</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #0a0f1e;
+            color: #eef2ff;
+            padding: 2rem 1.5rem;
+        }
+        .app-container { max-width: 1300px; margin: 0 auto; }
+        .video-section {
+            margin-bottom: 2.5rem;
+            border-radius: 28px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.6);
+        }
+        .video-section iframe {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: none;
+            border-radius: 28px;
+            background: #000;
+        }
+        .thumbnails-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.25rem;
+        }
+        .video-card {
+            background: #111827;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #1f2a3e;
+        }
+        .video-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.5);
+            border-color: #3b4a6b;
+        }
+        .video-card.active {
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.4);
+        }
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .placeholder-thumb {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e2a44, #0f172a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #60a5fa;
+        }
+        .video-title {
+            padding: 0.75rem 0.5rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-align: center;
+            background: #111827;
+            color: #e2e8f0;
+            border-top: 1px solid #1f2a3e;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.3;
+            min-height: 3rem;
+        }
+        .info-bar {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        h2 {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .video-count {
+            background: #1f2a44;
+            padding: 0.25rem 0.85rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        @media (max-width: 640px) {
+            body { padding: 1rem; }
+            .thumbnails-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; }
+            .video-title { font-size: 0.75rem; padding: 0.5rem; }
+            .video-section iframe { aspect-ratio: 16 / 9; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="info-bar">
+        <h2>📽️ Личная видеотека Пятиной Н.В.</h2>
+        <span class="video-count" id="videoCount">0 видео</span>
+    </div>
+
+    <div class="video-section">
+        <iframe id="mainPlayer"
+                src=""
+                allow="clipboard-write; autoplay"
+                allowfullscreen>
+        </iframe>
+    </div>
+
+    <div class="thumbnails-grid" id="thumbnailsGrid"></div>
+</div>
+
+<script>
+    // ------------------------------------------------------------
+    // 1. СПИСОК ВИДЕО (ВСЕ ССЫЛКИ С RUTUBE)
+    // ------------------------------------------------------------
+    const videos = [
+        {
+            id: 1,
+            title: "Отделение реабилитации детей раннего возраста, 2016 год",
+            src: "https://rutube.ru/video/private/05161c4420e121ed5325a582c4337355/?p=OwgMtCIVFgF0B7ITxjB_Og",
+            thumbnail: ""
+        },
+        {
+            id: 2,
+            title: "Первая репетиция флейтового класса, сентябрь 2025 год",
+            src: "https://rutube.ru/video/private/5900949d907448edd356a7c6b5d4f708/?p=5RRM-QU4mgbsRTcs4--rGQ",
+            thumbnail: ""
+        },
+        {
+            id: 3,
+            title: "Дом музыки",
+            src: "https://rutube.ru/video/private/482411380ad5f83c2a0903f03eb95140/?p=Ge4jn8m049a7y-fXsdQnCg",
+            thumbnail: ""
+        },
+        {
+            id: 4,
+            title: "Отделение ударных и духовых инструментов ДМШ 13, Екатеринбург",
+            src: "https://rutube.ru/video/private/a6f6cab1d10ada990ce3507006e76c01/?p=zavp3B1I5trHMah-KzFElg",
+            thumbnail: ""
+        },
+        {
+            id: 5,
+            title: "Младший оркестр народных инструментов Свердловской детской филармонии",
+            src: "https://rutube.ru/video/private/c79490ef1075dda4cf430b65928e0fb4/?p=sLLc1gWJgt4VshdOAL0hSQ",
+            thumbnail: ""
+        },
+        {
+            id: 6,
+            title: "Дебют в оркестре СДГФ",
+            src: "https://rutube.ru/video/private/afdbb3700ed99031ed38bc5af860748d/?p=kwP5RiYphoHnylZzUZTrCQ",
+            thumbnail: ""
+        },
+        {
+            id: 7,
+            title: "День Победы в деревне Чернобровкино",
+            src: "https://rutube.ru/video/private/09fb7ed02ccbfb57632482ba1d06d7a0/?p=tIfKZRHz8MD0jMCs6NIG4Q",
+            thumbnail: ""
+        }
+    ];
+
+    // ------------------------------------------------------------
+    // 2. ИНИЦИАЛИЗАЦИЯ
+    // ------------------------------------------------------------
+    const iframe = document.getElementById('mainPlayer');
+    const gridContainer = document.getElementById('thumbnailsGrid');
+    const videoCountSpan = document.getElementById('videoCount');
+
+    function loadVideo(src) {
+        iframe.src = src;
+    }
+
+    // ------------------------------------------------------------
+    // 3. ОТРИСОВКА ГАЛЕРЕИ
+    // ------------------------------------------------------------
+    function renderGallery() {
+        gridContainer.innerHTML = '';
+        videoCountSpan.innerText = `${videos.length} видео`;
+
+        videos.forEach((video) => {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.dataset.videoSrc = video.src;
+
+            const thumbDiv = document.createElement('div');
+            thumbDiv.className = 'thumbnail';
+            if (video.thumbnail && video.thumbnail.trim() !== "") {
+                const img = document.createElement('img');
+                img.src = video.thumbnail;
+                img.alt = video.title;
+                img.loading = "lazy";
+                img.onerror = () => {
+                    thumbDiv.innerHTML = `<div class="placeholder-thumb">🎬</div>`;
+                };
+                thumbDiv.appendChild(img);
+            } else {
+                const placeholderDiv = document.createElement('div');
+                placeholderDiv.className = 'placeholder-thumb';
+                placeholderDiv.innerText = '🎬';
+                thumbDiv.appendChild(placeholderDiv);
+            }
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'video-title';
+            titleDiv.innerText = video.title;
+
+            card.appendChild(thumbDiv);
+            card.appendChild(titleDiv);
+
+            card.addEventListener('click', () => {
+                const src = card.dataset.videoSrc;
+                if (src) {
+                    loadVideo(src);
+                    document.querySelectorAll('.video-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                }
+            });
+
+            gridContainer.appendChild(card);
+        });
+    }
+
+    // ------------------------------------------------------------
+    // 4. АВТОЗАГРУЗКА ПЕРВОГО ВИДЕО
+    // ------------------------------------------------------------
+    function loadFirstVideo() {
+        if (videos.length > 0 && videos[0].src) {
+            loadVideo(videos[0].src);
+            const firstCard = document.querySelector('.video-card');
+            if (firstCard) firstCard.classList.add('active');
+        }
+    }
+
+    // ------------------------------------------------------------
+    // 5. ЗАПУСК
+    // ------------------------------------------------------------
+    renderGallery();
+    loadFirstVideo();
+</script>
+</body>
+</html>
