@@ -25,8 +25,35 @@
             width: 100%;
             aspect-ratio: 16 / 9;
             border: none;
-            border-radius: 28px;
             background: #000;
+        }
+        /* Панель управления под плеером */
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 0.8rem 0;
+            background: #0a0f1e;
+            border-radius: 0 0 28px 28px;
+        }
+        .video-controls button {
+            background: #1f2a44;
+            color: #eef2ff;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .video-controls button:hover {
+            background: #3b4a6b;
+            transform: scale(1.02);
+        }
+        .video-controls button:active {
+            transform: scale(0.98);
         }
         .thumbnails-grid {
             display: grid;
@@ -115,7 +142,8 @@
             body { padding: 1rem; }
             .thumbnails-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; }
             .video-title { font-size: 0.75rem; padding: 0.5rem; }
-            .video-section iframe { aspect-ratio: 16 / 9; }
+            .video-controls { gap: 0.8rem; }
+            .video-controls button { padding: 6px 16px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -126,12 +154,17 @@
         <span class="video-count" id="videoCount">0 видео</span>
     </div>
 
+    <!-- Плеер + кнопки управления -->
     <div class="video-section">
         <iframe id="mainPlayer"
                 src=""
                 allow="clipboard-write; autoplay"
                 allowfullscreen>
         </iframe>
+        <div class="video-controls">
+            <button id="prevBtn">◀ Предыдущее</button>
+            <button id="nextBtn">Следующее ▶</button>
+        </div>
     </div>
 
     <div class="thumbnails-grid" id="thumbnailsGrid"></div>
@@ -139,7 +172,7 @@
 
 <script>
     // ------------------------------------------------------------
-    // 1. СПИСОК ВИДЕО — все ссылки заменены на embed-версии
+    // 1. СПИСОК ВИДЕО (embed-ссылки RuTube)
     // ------------------------------------------------------------
     const videos = [
         {
@@ -198,7 +231,47 @@
     }
 
     // ------------------------------------------------------------
-    // 3. ОТРИСОВКА ГАЛЕРЕИ
+    // 3. НАВИГАЦИЯ (ПРЕДЫДУЩЕЕ / СЛЕДУЮЩЕЕ)
+    // ------------------------------------------------------------
+    function getCurrentIndex() {
+        const activeCard = document.querySelector('.video-card.active');
+        if (!activeCard) return -1;
+        const src = activeCard.dataset.videoSrc;
+        return videos.findIndex(v => v.src === src);
+    }
+
+    function playNext() {
+        const idx = getCurrentIndex();
+        if (idx === -1) {
+            if (videos.length) loadVideo(videos[0].src);
+            return;
+        }
+        const nextIdx = (idx + 1) % videos.length; // зацикливание
+        loadVideo(videos[nextIdx].src);
+        // Обновить активный класс
+        document.querySelectorAll('.video-card').forEach(c => c.classList.remove('active'));
+        const cards = document.querySelectorAll('.video-card');
+        if (cards[nextIdx]) cards[nextIdx].classList.add('active');
+    }
+
+    function playPrev() {
+        const idx = getCurrentIndex();
+        if (idx === -1) {
+            if (videos.length) loadVideo(videos[0].src);
+            return;
+        }
+        const prevIdx = (idx - 1 + videos.length) % videos.length;
+        loadVideo(videos[prevIdx].src);
+        document.querySelectorAll('.video-card').forEach(c => c.classList.remove('active'));
+        const cards = document.querySelectorAll('.video-card');
+        if (cards[prevIdx]) cards[prevIdx].classList.add('active');
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', playNext);
+    document.getElementById('prevBtn').addEventListener('click', playPrev);
+
+    // ------------------------------------------------------------
+    // 4. ОТРИСОВКА ГАЛЕРЕИ
     // ------------------------------------------------------------
     function renderGallery() {
         gridContainer.innerHTML = '';
@@ -248,7 +321,7 @@
     }
 
     // ------------------------------------------------------------
-    // 4. АВТОЗАГРУЗКА ПЕРВОГО ВИДЕО
+    // 5. АВТОЗАГРУЗКА ПЕРВОГО ВИДЕО
     // ------------------------------------------------------------
     function loadFirstVideo() {
         if (videos.length > 0 && videos[0].src) {
@@ -259,7 +332,7 @@
     }
 
     // ------------------------------------------------------------
-    // 5. ЗАПУСК
+    // 6. ЗАПУСК
     // ------------------------------------------------------------
     renderGallery();
     loadFirstVideo();
